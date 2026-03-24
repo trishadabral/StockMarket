@@ -20,6 +20,8 @@
   --accent-strong: #d7e5ff;
   --violet: #a9a4ff;
   --cyan: #8de5ff;
+  --pink: #ff8fd8;
+  --pink-soft: rgba(255, 143, 216, 0.16);
   --gold: #e9d3a1;
   --warm: #c6d0df;
   --success: #90e0c2;
@@ -80,7 +82,7 @@ button {
   left: -8rem;
   width: 20rem;
   height: 20rem;
-  background: radial-gradient(circle, rgba(132, 162, 225, 0.22), transparent 65%);
+  background: radial-gradient(circle, rgba(169, 164, 255, 0.22), transparent 65%);
 }
 
 .ambient-right {
@@ -88,7 +90,7 @@ button {
   bottom: 10%;
   width: 22rem;
   height: 22rem;
-  background: radial-gradient(circle, rgba(188, 202, 235, 0.14), transparent 65%);
+  background: radial-gradient(circle, rgba(255, 143, 216, 0.16), transparent 65%);
   animation-delay: -4s;
 }
 
@@ -171,6 +173,10 @@ button {
   pointer-events: none;
 }
 
+.glass-panel:hover::after {
+  animation: pulseGlow 2.8s ease-in-out infinite;
+}
+
 .hero-panel,
 .stocks-panel,
 .side-panel,
@@ -205,12 +211,42 @@ button {
 
 .gradient-text {
   display: inline-block;
-  background: linear-gradient(120deg, var(--accent-strong), var(--cyan), var(--violet));
+  background: linear-gradient(120deg, var(--accent-strong), var(--cyan), var(--violet), var(--pink));
   background-size: 200% auto;
   color: transparent;
   -webkit-background-clip: text;
   background-clip: text;
   animation: textShift 8s linear infinite;
+}
+
+.hero-pulse-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.hero-pulse-chip {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, rgba(169, 164, 255, 0.16), rgba(255, 143, 216, 0.12));
+  color: #f6ddff;
+  box-shadow: 0 12px 24px rgba(30, 14, 42, 0.22);
+  animation: chipFloat 5.8s ease-in-out infinite;
+}
+
+.hero-pulse-chip:nth-child(2) {
+  animation-delay: -1.3s;
+}
+
+.hero-pulse-chip:nth-child(3) {
+  animation-delay: -2.6s;
 }
 
 .section-eyebrow {
@@ -250,14 +286,14 @@ button {
 }
 
 .primary-button {
-  background: linear-gradient(135deg, rgba(149, 186, 255, 0.32), rgba(133, 119, 231, 0.22));
-  border: 1px solid rgba(191, 209, 255, 0.34);
-  box-shadow: 0 16px 40px rgba(65, 85, 126, 0.28);
+  background: linear-gradient(135deg, rgba(149, 186, 255, 0.28), rgba(169, 164, 255, 0.24), rgba(255, 143, 216, 0.18));
+  border: 1px solid rgba(216, 186, 255, 0.34);
+  box-shadow: 0 16px 40px rgba(84, 58, 121, 0.28);
 }
 
 .secondary-button,
 .ghost-button {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(143, 184, 255, 0.06));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(169, 164, 255, 0.08), rgba(255, 143, 216, 0.06));
   border: 1px solid rgba(255, 255, 255, 0.11);
 }
 
@@ -318,10 +354,10 @@ button {
 
 .metric-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(191, 209, 255, 0.2);
+  border-color: rgba(216, 186, 255, 0.24);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 18px 30px rgba(0, 0, 0, 0.22);
+    0 18px 30px rgba(46, 20, 63, 0.22);
 }
 
 .metric-card span,
@@ -420,12 +456,12 @@ button {
 .stock-card:hover,
 .result-card:hover {
   transform: translateY(-6px);
-  border-color: rgba(165, 191, 241, 0.22);
-  box-shadow: 0 22px 40px rgba(0, 0, 0, 0.28);
+  border-color: rgba(216, 186, 255, 0.24);
+  box-shadow: 0 22px 40px rgba(39, 16, 55, 0.28);
 }
 
 .stock-card-accent {
-  background: linear-gradient(180deg, rgba(18, 22, 40, 0.98), rgba(11, 15, 28, 0.82));
+  background: linear-gradient(180deg, rgba(24, 18, 42, 0.98), rgba(13, 12, 28, 0.84));
 }
 
 .stock-card.featured {
@@ -453,9 +489,9 @@ button {
 }
 
 .stock-ticker {
-  background: linear-gradient(135deg, rgba(143, 184, 255, 0.16), rgba(141, 229, 255, 0.09));
-  color: var(--accent-strong);
-  border: 1px solid rgba(143, 184, 255, 0.22);
+  background: linear-gradient(135deg, rgba(169, 164, 255, 0.18), rgba(255, 143, 216, 0.1));
+  color: #f3deff;
+  border: 1px solid rgba(216, 186, 255, 0.22);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
@@ -544,11 +580,11 @@ button {
 }
 
 .result-card-warm {
-  background: linear-gradient(180deg, rgba(30, 24, 20, 0.9), rgba(19, 15, 16, 0.8));
+  background: linear-gradient(180deg, rgba(40, 24, 32, 0.9), rgba(21, 14, 19, 0.82));
 }
 
 .result-card-cool {
-  background: linear-gradient(180deg, rgba(12, 20, 33, 0.94), rgba(10, 13, 24, 0.8));
+  background: linear-gradient(180deg, rgba(22, 18, 39, 0.94), rgba(10, 13, 24, 0.82));
 }
 
 .result-list {
@@ -699,6 +735,28 @@ button {
   }
   100% {
     background-position: 200% 50%;
+  }
+}
+
+@keyframes chipFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes pulseGlow {
+  0%,
+  100% {
+    opacity: 0.75;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
   }
 }
 

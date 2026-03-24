@@ -1,0 +1,42 @@
+[33mcommit 28f5543278e40f74e5ee4b5a521282352d3a6dc9[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m)[m
+Author: trishadabral <trishadabral@gmail.com>
+Date:   Mon Mar 23 12:10:36 2026 +0530
+
+    fixed ui
+
+.env.example
+.gitignore
+README.md
+backend/.gitattributes
+backend/.gitignore
+backend/build.gradle
+backend/gradle/wrapper/gradle-wrapper.jar
+backend/gradle/wrapper/gradle-wrapper.properties
+backend/gradlew
+backend/gradlew.bat
+backend/settings.gradle
+backend/src/main/java/com/example/backend/BackendApplication.java
+backend/src/main/java/com/example/backend/algorithms/GreedyAllocationAlgorithm.java
+backend/src/main/java/com/example/backend/algorithms/HeapRankingAlgorithm.java
+backend/src/main/java/com/example/backend/algorithms/KnapsackAlgorithm.java
+backend/src/main/java/com/example/backend/config/CorsConfig.java
+backend/src/main/java/com/example/backend/controller/HealthController.java
+backend/src/main/java/com/example/backend/controller/StockController.java
+backend/src/main/java/com/example/backend/model/Stock.java
+backend/src/main/resources/application.properties
+backend/src/test/java/com/example/backend/BackendApplicationTests.java
+frontend/index.html
+frontend/package-lock.json
+frontend/package.json
+frontend/postcss.config.cjs
+frontend/src/App.jsx
+frontend/src/components/NotificationPanel.jsx
+frontend/src/components/StockGraph.jsx
+frontend/src/components/StockSelector.jsx
+frontend/src/index.css
+frontend/src/main.jsx
+frontend/src/pages/StocksPage.jsx
+frontend/src/services/api.js
+frontend/src/services/websocket.js
+frontend/tailwind.config.js
+frontend/vite.config.js

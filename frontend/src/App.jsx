@@ -159,10 +159,12 @@ function App() {
               Modern stock analysis with a
               <span className="gradient-text"> colder, premium dashboard feel.</span>
             </h1>
-            <p className="hero-description">
-              A refined command center for stock discovery, top-performer ranking,
-              and portfolio optimization using greedy and knapsack strategies.
-            </p>
+
+            <div className="hero-pulse-row">
+              <span className="hero-pulse-chip">Live market board</span>
+              <span className="hero-pulse-chip">Glass optimizer</span>
+              <span className="hero-pulse-chip">Realtime portfolio feel</span>
+            </div>
 
             <div className="hero-actions">
               <button className="primary-button" onClick={handleKnapsack}>
@@ -198,7 +200,6 @@ function App() {
             <SectionHeading
               eyebrow="Market board"
               title="Available Stocks"
-              description="Muted glass cards with hover lift and crisp hierarchy for faster scanning."
             />
             <div className="stock-grid">
               {stocks.map((stock) => (
