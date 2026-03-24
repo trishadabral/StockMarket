@@ -372,7 +372,7 @@ This project is for educational purposes.
 
 ## 👨‍💻 Author
 
-Built as a demonstration of full-stack development with algorithmic analysis.
+Built by Trisha Dabral.
 
 ---
 
