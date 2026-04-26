@@ -2,8 +2,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   getGreedyPortfolio,
   getOptimizedPortfolio,
-  getStocks,
-  getTopKStocks,
   optimizePortfolioWithTopK,
 } from "./services/api";
 import LiveChart from "./components/LiveChart";
@@ -29,6 +27,41 @@ function getSignalClass(value) {
   if (normalized.startsWith("SELL") || normalized === "DOWN") return "signal-negative";
   return "signal-neutral";
 }
+
+function calculateStdDev(values) {
+  if (!Array.isArray(values) || values.length === 0) return 0;
+  const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
+  const variance =
+    values.reduce((sum, value) => sum + Math.pow(value - mean, 2), 0) / values.length;
+  return Math.sqrt(variance);
+}
+
+const generateStocks = () => {
+  const symbols = [
+    "AAPL", "GOOGL", "MSFT", "TSLA", "AMZN", "NVDA", "META", "NFLX",
+    "BABA", "ORCL", "INTC", "AMD", "IBM", "UBER", "LYFT", "SHOP",
+    "ADBE", "CRM", "PYPL", "SQ", "SONY", "TCS", "INFY", "HCL",
+    "WIPRO", "SAP", "DELL", "HPQ", "CSCO", "QCOM", "TXN", "AVGO"
+  ];
+
+  return symbols.map((symbol) => {
+    const price = 50 + Math.random() * 500;
+    const history = Array.from({ length: 10 }, (_, idx) =>
+      Number((price + (idx - 5) * ((Math.random() - 0.5) * 2)).toFixed(2))
+    );
+    const volatility = calculateStdDev(history);
+    return {
+      symbol,
+      price: price.toFixed(2),
+      change: 0,
+      trend: "SIDEWAYS",
+      volatility: Number(volatility.toFixed(2)),
+      suggestion: "HOLD",
+      expectedReturn: Number((3 + Math.random() * 8).toFixed(2)),
+      history,
+    };
+  });
+};
 
 function GlassPanel({ className = "", children }) {
   return <section className={`glass-panel ${className}`}>{children}</section>;
@@ -166,9 +199,10 @@ function ResultCard({ title, caption, result, tone }) {
 }
 
 function App() {
-  const [stocks, setStocks] = useState([]);
+  const [stocks, setStocks] = useState(generateStocks());
   const [topStocks, setTopStocks] = useState([]);
   const [stockAnalysis, setStockAnalysis] = useState(null);
+  const [liveAlerts, setLiveAlerts] = useState([]);
 
   const [topK, setTopK] = useState("3");
   const [budget, setBudget] = useState("");
@@ -181,72 +215,97 @@ function App() {
   const previousPriceRef = useRef(null);
 
   useEffect(() => {
-    loadStocks();
-    loadTopStocks(3);
-    loadStockAnalysis();
-
-    const stockRefreshInterval = window.setInterval(() => {
-      loadStockAnalysis();
-    }, 3000);
-
     const timer = window.setTimeout(() => setIsLoaded(true), 120);
     return () => {
       window.clearTimeout(timer);
-      window.clearInterval(stockRefreshInterval);
     };
   }, []);
 
-  const loadStocks = async () => {
-    try {
-      const data = await getStocks();
-      setStocks(Array.isArray(data) ? data : []);
-    } catch {
-      setStocks([]);
-    }
-  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStocks((prev) =>
+        prev.map((stock) => {
+          const delta = (Math.random() - 0.5) * 2;
+          const currentPrice = Number(stock.price);
+          const newPrice = Math.max(1, currentPrice + delta);
+          const updatedHistory = [...(stock.history || []), Number(newPrice.toFixed(2))].slice(-10);
+          const volatility = calculateStdDev(updatedHistory);
+          const trend =
+            delta > 0.5 ? "UP" :
+            delta < -0.5 ? "DOWN" :
+            "SIDEWAYS";
+          const suggestion =
+            trend === "UP" && volatility < 3
+              ? "BUY"
+              : trend === "DOWN"
+              ? "SELL"
+              : "HOLD";
 
-  const loadTopStocks = async (requestedK) => {
-    const k = Math.max(1, Number(requestedK) || 3);
-    try {
-      const data = await getTopKStocks(k);
-      setTopStocks(Array.isArray(data) ? data : []);
-    } catch {
-      setTopStocks([]);
-    }
-  };
+          return {
+            ...stock,
+            price: newPrice.toFixed(2),
+            change: Number(delta.toFixed(2)),
+            trend,
+            volatility: Number(volatility.toFixed(2)),
+            suggestion,
+            expectedReturn: Number(
+              (
+                (trend === "UP" ? 9 : trend === "DOWN" ? 2 : 5) +
+                Math.max(0, 5 - volatility)
+              ).toFixed(2)
+            ),
+            history: updatedHistory,
+          };
+        })
+      );
+    }, 2000);
 
-  const loadStockAnalysis = async () => {
-    try {
-      const response = await fetch("http://localhost:8080/api/stocks/AAPL");
-      if (!response.ok) {
-        setStockAnalysis(null);
-        setPriceChangePercent(null);
-        return;
-      }
-      const data = await response.json();
-      const currentPrice = Number(data?.price);
+    return () => clearInterval(interval);
+  }, []);
 
-      if (Number.isFinite(currentPrice) && currentPrice > 0) {
-        if (previousPriceRef.current !== null && previousPriceRef.current > 0) {
-          const change = ((currentPrice - previousPriceRef.current) / previousPriceRef.current) * 100;
-          setPriceChangePercent(change);
-        } else {
-          setPriceChangePercent(null);
-        }
-        previousPriceRef.current = currentPrice;
-      } else {
-        setPriceChangePercent(null);
-      }
+  useEffect(() => {
+    const k = Math.max(1, Number(topK) || 3);
+    const sorted = [...stocks].sort((a, b) => b.expectedReturn - a.expectedReturn);
+    setTopStocks(sorted.slice(0, k));
 
-      setStockAnalysis(data || null);
-    } catch {
-      setStockAnalysis(null);
+    const focus = stocks.find((stock) => stock.symbol === "AAPL") || stocks[0];
+    if (!focus) return;
+
+    if (previousPriceRef.current !== null && previousPriceRef.current > 0) {
+      const change =
+        ((Number(focus.price) - previousPriceRef.current) / previousPriceRef.current) * 100;
+      setPriceChangePercent(change);
+    } else {
       setPriceChangePercent(null);
     }
-  };
+    previousPriceRef.current = Number(focus.price);
+
+    setStockAnalysis({
+      symbol: focus.symbol,
+      price: Number(focus.price),
+      trend: focus.trend,
+      volatility: Number(focus.volatility),
+      suggestion: focus.suggestion,
+      alerts: [],
+    });
+
+    const nextAlerts = [];
+    if (Number(focus.price) > 300) {
+      nextAlerts.push(`${focus.symbol}: Price crossed threshold`);
+    }
+    if (Number(focus.volatility) > 5) {
+      nextAlerts.push(`${focus.symbol}: High volatility detected`);
+    }
+
+    if (nextAlerts.length > 0) {
+      setLiveAlerts((prev) => [...nextAlerts, ...prev].slice(0, 20));
+    }
+  }, [stocks, topK]);
 
   const handleTopKSearch = async () => {
-    await loadTopStocks(topK);
+    const k = Math.max(1, Number(topK) || 3);
+    const sorted = [...stocks].sort((a, b) => b.expectedReturn - a.expectedReturn);
+    setTopStocks(sorted.slice(0, k));
   };
 
   const handlePortfolioOptimize = async () => {
@@ -284,7 +343,11 @@ function App() {
   const safeSuggestion = String(stockAnalysis?.suggestion || "HOLD");
   const safeVolatility = Number(stockAnalysis?.volatility ?? 0);
   const safeVolatilityLabel = getVolatilityLevel(safeVolatility);
-  const safeAlerts = Array.isArray(stockAnalysis?.alerts) ? stockAnalysis.alerts : [];
+  const backendAlerts = Array.isArray(stockAnalysis?.alerts) ? stockAnalysis.alerts : [];
+  const safeAlerts = [...liveAlerts, ...backendAlerts].slice(0, 20);
+  const sortedStocks = [...stocks].sort((a, b) => b.change - a.change);
+  const topGainers = sortedStocks.filter((s) => s.change > 0).slice(0, 15);
+  const topLosers = sortedStocks.filter((s) => s.change < 0).slice(0, 15);
 
   const selectedStocks = Array.isArray(portfolioResult?.selectedStocks)
     ? portfolioResult.selectedStocks
@@ -302,15 +365,46 @@ function App() {
         <HeroCard data={stockAnalysis} changePercent={priceChangePercent} />
 
         <section className="content-grid">
-          <GlassPanel className="stocks-panel reveal reveal-2">
+          <GlassPanel className="stocks-panel reveal reveal-2 self-start h-fit" style={{ alignSelf: "start" }}>
             <SectionHeading eyebrow="Today's Stocks" title="Today's Stocks" />
-            <div
-              className="h-72 overflow-y-auto pr-2"
-              style={{ display: "grid", gap: "16px", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}
-            >
-              {stocks.map((stock) => (
-                <StockCard key={`${stock?.symbol}-${stock?.price}`} stock={stock} />
-              ))}
+            <div className="max-h-80 overflow-y-auto pr-2 space-y-2">
+              <div>
+                <h3 style={{ margin: "0 0 12px" }}>🔥 Top Gainers</h3>
+                <div className="result-list">
+                  {topGainers.map((stock) => (
+                    <article key={`gainer-${stock.symbol}`} className="stock-card">
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr auto", alignItems: "center", gap: "12px" }}>
+                        <strong>{stock.symbol}</strong>
+                        <div style={{ textAlign: "right" }}>
+                          <p style={{ margin: 0, fontWeight: 700 }}>{formatCurrency(stock.price)}</p>
+                          <p className="text-green-400" style={{ margin: 0 }}>
+                            +{stock.change}%
+                          </p>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h3 style={{ margin: "0 0 12px" }}>🔻 Top Losers</h3>
+                <div className="result-list">
+                  {topLosers.map((stock) => (
+                    <article key={`loser-${stock.symbol}`} className="stock-card">
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr auto", alignItems: "center", gap: "12px" }}>
+                        <strong>{stock.symbol}</strong>
+                        <div style={{ textAlign: "right" }}>
+                          <p style={{ margin: 0, fontWeight: 700 }}>{formatCurrency(stock.price)}</p>
+                          <p className="text-red-400" style={{ margin: 0 }}>
+                            {stock.change}%
+                          </p>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </div>
             </div>
           </GlassPanel>
 
@@ -339,7 +433,10 @@ function App() {
               </article>
             </div>
             <div className="mt-4">
-              <LiveChart currentPrice={Number(stockAnalysis?.price ?? 120)} />
+              <LiveChart
+                currentPrice={Number(stockAnalysis?.price ?? 120)}
+                series={stocks.find((stock) => stock.symbol === "AAPL")?.history || []}
+              />
             </div>
           </GlassPanel>
         </section>
@@ -395,7 +492,7 @@ function App() {
                 <strong className={getSignalClass(safeSuggestion)}>{safeSuggestion}</strong>
               </div>
             </article>
-            <div className="result-list" style={{ marginTop: 16 }}>
+            <div className="result-list overflow-y-auto pr-2" style={{ marginTop: 16, maxHeight: "240px" }}>
               {safeAlerts.length === 0 ? (
                 <div className="empty-state">
                   <span className="empty-state-dot" />

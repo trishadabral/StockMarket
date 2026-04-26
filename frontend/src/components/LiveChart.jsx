@@ -25,11 +25,11 @@ function buildSeedData(basePrice) {
   return seed;
 }
 
-export default function LiveChart({ currentPrice = 120 }) {
-  const [series, setSeries] = useState(() => buildSeedData(currentPrice));
+export default function LiveChart({ currentPrice = 120, series = [] }) {
+  const [internalSeries, setInternalSeries] = useState(() => buildSeedData(currentPrice));
 
   useEffect(() => {
-    setSeries((prev) => {
+    setInternalSeries((prev) => {
       if (prev.length === 0) {
         return buildSeedData(currentPrice);
       }
@@ -43,8 +43,11 @@ export default function LiveChart({ currentPrice = 120 }) {
   }, [currentPrice]);
 
   useEffect(() => {
+    if (Array.isArray(series) && series.length > 0) {
+      return;
+    }
     const timer = window.setInterval(() => {
-      setSeries((prev) => {
+      setInternalSeries((prev) => {
         const last = prev[prev.length - 1]?.price ?? Number(currentPrice) ?? 120;
         const nextPrice = Number((last + (Math.random() - 0.5) * 3).toFixed(2));
         const nextPoint = {
@@ -57,11 +60,21 @@ export default function LiveChart({ currentPrice = 120 }) {
     }, 2000);
 
     return () => window.clearInterval(timer);
-  }, [currentPrice]);
+  }, [currentPrice, series]);
+
+  const displaySeries = useMemo(() => {
+    if (Array.isArray(series) && series.length > 0) {
+      return series.map((price, index) => ({
+        time: `${index + 1}`,
+        price: Number(price),
+      }));
+    }
+    return internalSeries;
+  }, [internalSeries, series]);
 
   const chartData = useMemo(() => {
-    const labels = series.map((_, index) => `${index + 1}`);
-    const points = series.map((item) => item.price);
+    const labels = displaySeries.map((_, index) => `${index + 1}`);
+    const points = displaySeries.map((item) => item.price);
     return {
       labels,
       datasets: [
@@ -76,7 +89,7 @@ export default function LiveChart({ currentPrice = 120 }) {
         },
       ],
     };
-  }, [series]);
+  }, [displaySeries]);
 
   const chartOptions = useMemo(
     () => ({
