@@ -1,10 +1,12 @@
 package com.example.backend.algorithms;
 
 import com.example.backend.model.Stock;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class KnapsackAlgorithm {
 
     public List<Stock> optimizePortfolio(List<Stock> stocks, int budget) {

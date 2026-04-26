@@ -33,3 +33,12 @@ export async function getOptimizedPortfolio(budget) {
   });
   return response.data;
 }
+
+// Portfolio optimization with budget + topK
+export async function optimizePortfolioWithTopK(budget, topK) {
+  const response = await api.post("/portfolio/optimize", {
+    budget: Number(budget),
+    topK: Number(topK),
+  });
+  return response.data;
+}

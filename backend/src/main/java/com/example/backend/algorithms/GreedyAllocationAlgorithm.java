@@ -1,11 +1,13 @@
 package com.example.backend.algorithms;
 
 import com.example.backend.model.Stock;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+@Component
 public class GreedyAllocationAlgorithm {
 
     public List<Stock> allocate(List<Stock> stocks, double budget) {
