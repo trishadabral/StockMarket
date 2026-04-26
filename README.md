@@ -1,46 +1,33 @@
 # Stock Decision Engine
 
-A full-stack stock analysis dashboard that combines algorithmic decision-making with an interactive UI to simulate real-time market insights.
-
----
-
-## Demo
-
-🔗 Live Demo: *Add your deployed link here*  
-🎥 Demo Video: *Add Loom / Drive link here*
-
----
-
-## Screenshots
-
-### Dashboard Overview
-
-![Dashboard](./assets/dashboard.png)
-
-### Top K Stocks
-
-![Top K](./assets/topk.png)
-
-### Portfolio Optimizer
-
-![Portfolio](./assets/portfolio.png)
-
-### Live Chart
-
-![Chart](./assets/chart.png)
+A full-stack stock analysis dashboard that combines algorithmic decision-making with an interactive, modern UI to simulate real-time market insights.
 
 ---
 
 ## Overview
 
-This project demonstrates how core Data Structures and Algorithms can be applied to real-world financial decision-making.
+Stock Decision Engine is designed to demonstrate how core Data Structures and Algorithms can be applied to real-world financial systems.
 
-It provides a structured dashboard where users can:
+The platform provides a structured dashboard where users can:
 
-* Analyze stock trends
-* Rank top-performing stocks
-* Optimize investment portfolios
-* View dynamic price movement
+* Analyze stock behavior dynamically
+* Identify top-performing stocks
+* Optimize portfolios under budget constraints
+* Interpret actionable insights through a clean interface
+
+---
+
+## System Architecture
+
+![System Architecture](./asset/system_architecture.png)
+![System Architecture Detail](./asset/system_architecture_detail.png)
+
+The system follows a layered architecture:
+
+* **Frontend (React)** handles user interaction and visualization
+* **Backend (Spring Boot)** processes logic and algorithms
+* **Algorithm Layer** powers decision-making (ranking, optimization, analysis)
+* **API Layer** connects frontend and backend via REST endpoints
 
 ---
 
@@ -48,18 +35,18 @@ It provides a structured dashboard where users can:
 
 ### Live Stock Insight
 
-* Real-time-like price updates
-* Trend detection (UP / DOWN / SIDEWAYS)
-* Volatility analysis
-* Actionable suggestion (BUY / SELL / HOLD)
+* Dynamic price updates (simulated real-time)
+* Trend detection: **UP / DOWN / SIDEWAYS**
+* Volatility measurement
+* Actionable suggestion: **BUY / SELL / HOLD**
 
 ---
 
 ### Top K Stock Selection
 
-* User-defined K value
-* Returns highest ranked stocks
-* Optimized using efficient selection logic
+* User inputs value of K
+* System returns top-performing stocks
+* Implemented using efficient ranking logic (Heap / Sorting)
 
 ---
 
@@ -67,14 +54,15 @@ It provides a structured dashboard where users can:
 
 * Budget-based stock selection
 * Maximizes expected return
-* Uses Knapsack algorithm
+* Uses **Knapsack Algorithm**
 
 ---
 
 ### Dynamic Chart
 
-* Continuously updating line chart
-* Simulates live market behavior
+* Moving line chart for price visualization
+* Updates at regular intervals
+* Enhances real-time experience
 
 ---
 
@@ -87,13 +75,13 @@ It provides a structured dashboard where users can:
 
 ## Tech Stack
 
-**Frontend**
+### Frontend
 
 * React (Vite)
-* Tailwind CSS
+* Tailwind CSS (Glassmorphism UI)
 * Recharts
 
-**Backend**
+### Backend
 
 * Java
 * Spring Boot
@@ -102,32 +90,36 @@ It provides a structured dashboard where users can:
 
 ## Algorithms Used
 
-* Heap / Sorting -> Top K selection
-* Knapsack -> Portfolio optimization
-* Sliding Window -> Volatility calculation
-* Trend Analysis -> Price movement
+* **Heap / Sorting** -> Top K stock selection
+* **Knapsack Algorithm** -> Portfolio optimization
+* **Sliding Window** -> Volatility calculation
+* **Trend Analysis** -> Price movement prediction
 
 ---
 
 ## Project Structure
 
+```
 backend/
-
-* controller/
-* service/
-* model/
-* algorithms/
+ ├── controller/
+ ├── service/
+ ├── model/
+ ├── algorithms/
+ └── config/
 
 frontend/
-
-* components/
-* pages/
+ ├── components/
+ ├── pages/
+ └── App.jsx
+```
 
 ---
 
 ## API Endpoints
 
-### GET /api/stocks/{symbol}
+### Get Stock Insight
+
+GET /api/stocks/{symbol}
 
 Returns:
 
@@ -138,51 +130,68 @@ Returns:
 
 ---
 
-### POST /api/portfolio/optimize
+### Optimize Portfolio
 
-Input:
+POST /api/portfolio/optimize
+
+Request:
+
+```
 {
-"budget": 500,
-"topK": 10
+  "budget": 500,
+  "topK": 10
 }
+```
 
-Output:
+Response:
 
 * selected stocks
-* total return
+* total cost
+* expected return
 
 ---
 
-## Setup
+## Setup Instructions
 
 ### Backend
 
-cd backend  
+```
+cd backend
 ./gradlew bootRun
+```
 
-### Frontend
-
-cd frontend  
-npm install  
-npm run dev
+Runs on: http://localhost:8080
 
 ---
 
-## Highlights
+### Frontend
 
-* Practical use of DSA in a real application
-* Clean backend architecture
-* Interactive UI with dynamic data
-* Designed for clarity and usability
+```
+cd frontend
+npm install
+npm run dev
+```
+
+Runs on: http://localhost:5173
+
+---
+
+## Key Highlights
+
+* Practical application of DSA in a real-world scenario
+* Clean modular backend architecture
+* Interactive and user-friendly dashboard
+* Simulated real-time data for better demonstration
+* Balanced focus on logic and UI
 
 ---
 
 ## Future Scope
 
-* Real-time stock API integration
-* Advanced prediction models
-* User accounts & portfolio tracking
-* Deployment
+* Integration with real-time stock APIs
+* Advanced predictive models
+* User authentication & portfolio history
+* Deployment (AWS / Vercel)
 
 ---
 
@@ -194,4 +203,4 @@ Trisha Dabral
 
 ## License
 
-For educational use.
+This project is intended for educational purposes.
