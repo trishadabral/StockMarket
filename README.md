@@ -20,7 +20,6 @@ The platform provides a structured dashboard where users can:
 ## System Architecture
 
 ![System Architecture](./asset/system_architecture.png)
-![System Architecture Detail](./asset/system_architecture_detail.png)
 
 The system follows a layered architecture:
 
